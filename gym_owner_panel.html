@@ -8,7 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GYM Owner Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --bg-primary: #0a0a0a; --bg-secondary: #111111; --bg-card: #161616; --bg-hover: #1e1e1e;
@@ -65,13 +64,6 @@
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
         .badge-present { background: rgba(34,197,94,0.15); color: var(--success); }
         .badge-inside { background: rgba(59,130,246,0.15); color: var(--accent); }
-        .excel-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
-        .excel-card-title { font-size: 1rem; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-        .excel-card-title svg { width: 22px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 2; }
-        .excel-card-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; }
-        .excel-options { display: flex; flex-direction: column; gap: 10px; }
-        .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; }
-        .file-input-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
         .toast { position: fixed; bottom: 30px; right: 30px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 2000; }
         .toast.show { transform: translateY(0); opacity: 1; }
         .toast.success { border-color: var(--success); } .toast.error { border-color: var(--danger); }
@@ -163,8 +155,9 @@
         </li>
         <div class="nav-divider"></div>
         <div class="nav-label">Management</div>
-        <li class="nav-item" data-section="excel">
+        <li class="nav-item" onclick="window.location.href='excel.html'" style="cursor:pointer;">
             <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Excel
+            <svg viewBox="0 0 24 24" style="width:13px;height:13px;margin-left:auto;opacity:0.5;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         </li>
         <li class="nav-item" data-section="reports">
             <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reports
@@ -260,113 +253,6 @@
         </div>
     </div>
 
-
-    <!-- EXCEL -->
-    <div class="section" id="section-excel">
-        <div class="page-header"><div><div class="page-title">Excel Import / Export</div><div class="page-subtitle">Import members or attendance from .xlsx files</div></div></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-            <div class="excel-card">
-                <div class="excel-card-title"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import Data</div>
-                <div class="excel-card-desc">Import any data from .xlsx — synced directly to Firebase</div>
-                <div class="excel-options" style="gap:10px;">
-
-                    <!-- Members -->
-                    <div class="file-input-wrapper" style="display:block;">
-                        <button class="btn btn-secondary" style="width:100%;justify-content:flex-start;gap:12px;padding:12px 16px;">
-                            <svg viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;stroke:var(--accent);fill:none;stroke-width:2;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Import Members
-                            <span style="margin-left:auto;font-size:0.75rem;color:var(--text-muted);">→ members</span>
-                        </button>
-                        <input type="file" accept=".xlsx,.xls" id="excelImportInput" data-type="members" onchange="handleExcelImport(this,'members')">
-                    </div>
-
-                    <!-- Attendance -->
-                    <div class="file-input-wrapper" style="display:block;">
-                        <button class="btn btn-secondary" style="width:100%;justify-content:flex-start;gap:12px;padding:12px 16px;">
-                            <svg viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;stroke:var(--success);fill:none;stroke-width:2;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Import Attendance
-                            <span style="margin-left:auto;font-size:0.75rem;color:var(--text-muted);">→ attendance</span>
-                        </button>
-                        <input type="file" accept=".xlsx,.xls" id="excelImportAttendanceInput" data-type="attendance" onchange="handleExcelImport(this,'attendance')">
-                    </div>
-
-                    <!-- Supplements -->
-                    <div class="file-input-wrapper" style="display:block;">
-                        <button class="btn btn-secondary" style="width:100%;justify-content:flex-start;gap:12px;padding:12px 16px;">
-                            <svg viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;stroke:var(--purple);fill:none;stroke-width:2;"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="8" rx="2"/><path d="M3 10v8a2 2 0 002 2h14a2 2 0 002-2v-8"/><path d="M10 16h4"/></svg>Import Supplements
-                            <span style="margin-left:auto;font-size:0.75rem;color:var(--text-muted);">→ supplements</span>
-                        </button>
-                        <input type="file" accept=".xlsx,.xls" id="excelImportSupplementsInput" data-type="supplements" onchange="handleExcelImport(this,'supplements')">
-                    </div>
-
-                    <!-- Equipment -->
-                    <div class="file-input-wrapper" style="display:block;">
-                        <button class="btn btn-secondary" style="width:100%;justify-content:flex-start;gap:12px;padding:12px 16px;">
-                            <svg viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;stroke:var(--warning);fill:none;stroke-width:2;"><path d="M6.5 6.5h11"/><path d="M6.5 17.5h11"/><path d="M4 6.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/><path d="M4 22.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/><path d="M20 6.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/><path d="M20 22.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/><path d="M4 6.5v11"/><path d="M20 6.5v11"/></svg>Import Equipment
-                            <span style="margin-left:auto;font-size:0.75rem;color:var(--text-muted);">→ equipment</span>
-                        </button>
-                        <input type="file" accept=".xlsx,.xls" id="excelImportEquipmentInput" data-type="equipment" onchange="handleExcelImport(this,'equipment')">
-                    </div>
-
-                    <!-- Supplement Sales -->
-                    <div class="file-input-wrapper" style="display:block;">
-                        <button class="btn btn-secondary" style="width:100%;justify-content:flex-start;gap:12px;padding:12px 16px;">
-                            <svg viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;stroke:var(--pink);fill:none;stroke-width:2;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>Import Supplement Sales
-                            <span style="margin-left:auto;font-size:0.75rem;color:var(--text-muted);">→ sales</span>
-                        </button>
-                        <input type="file" accept=".xlsx,.xls" id="excelImportSalesInput" data-type="sales" onchange="handleExcelImport(this,'sales')">
-                    </div>
-
-                    <!-- Staff -->
-                    <div class="file-input-wrapper" style="display:block;">
-                        <button class="btn btn-secondary" style="width:100%;justify-content:flex-start;gap:12px;padding:12px 16px;">
-                            <svg viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;stroke:var(--success);fill:none;stroke-width:2;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Import Staff
-                            <span style="margin-left:auto;font-size:0.75rem;color:var(--text-muted);">→ staff</span>
-                        </button>
-                        <input type="file" accept=".xlsx,.xls" id="excelImportStaffInput" data-type="staff" onchange="handleExcelImport(this,'staff')">
-                    </div>
-
-                    <div id="importStatus" style="font-size:0.82rem;color:var(--text-muted);min-height:18px;margin-top:4px;padding:8px;background:var(--bg-secondary);border-radius:6px;display:none;"></div>
-
-                    <div style="margin-top:4px;padding-top:12px;border-top:1px solid var(--border);font-size:0.76rem;color:var(--text-muted);line-height:1.6;">
-                        <b style="color:var(--text-secondary);">Members:</b> Power ID, Name, Phone, Email, Package, Fitness Goal, Status, Fee, Last Payment, Joined<br>
-                        <b style="color:var(--text-secondary);">Attendance:</b> Power ID, Date (YYYY-MM-DD), Status (present/absent), Time<br>
-                        <b style="color:var(--text-secondary);">Supplements:</b> Name, Brand, Price, Stock<br>
-                        <b style="color:var(--text-secondary);">Equipment:</b> Name, Category, Quantity, Condition, Purchase Date, Notes<br>
-                        <b style="color:var(--text-secondary);">Sales:</b> Date, Supplement, Quantity, Unit Price, Total<br>
-                        <b style="color:var(--text-secondary);">Staff:</b> Name, Role, Phone, Email, Salary, Join Date, Status
-                    </div>
-                </div>
-            </div>
-            <div class="excel-card">
-                <div class="excel-card-title"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export Data</div>
-                <div class="excel-card-desc">Export data to Excel for backup or analysis</div>
-                <div class="excel-options" style="gap:10px;">
-                    <button class="btn btn-primary" onclick="exportData('members')" style="width:100%;padding:13px 16px;">Export All Members</button>
-                    <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:14px;">
-                        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">Select date for daily attendance:</div>
-                        <input type="date" id="exportDailyDate" class="form-input" style="margin-bottom:10px;">
-                        <button class="btn btn-primary" onclick="exportDailyAttendance()" style="width:100%;padding:12px 16px;">Export Daily Attendance</button>
-                    </div>
-                    <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:14px;">
-                        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">Select month for monthly attendance:</div>
-                        <input type="month" id="exportMonthlyMonth" class="form-input" style="margin-bottom:10px;">
-                        <button class="btn btn-primary" onclick="exportMonthlyAttendance()" style="width:100%;padding:12px 16px;">Export Monthly Attendance</button>
-                    </div>
-                    <button class="btn btn-primary" onclick="exportFeesPending()" style="width:100%;padding:13px 16px;">Export Fees Pending</button>
-                    <button class="btn btn-primary" onclick="exportData('fees')" style="width:100%;padding:13px 16px;">Export Full Fees Report</button>
-                    <button class="btn btn-secondary" onclick="exportData('supplements')" style="width:100%;padding:13px 16px;">Export Supplements</button>
-                    <button class="btn btn-secondary" onclick="exportData('equipment')" style="width:100%;padding:13px 16px;">Export Equipment</button>
-                    <button class="btn btn-secondary" onclick="exportData('staff')" style="width:100%;padding:13px 16px;">Export Staff</button>
-                    <div style="padding-top:12px;border-top:1px solid var(--border);margin-top:4px;">
-                        <div style="font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">Stored Data Status</div>
-                        <div id="dataStatusList" style="font-size:0.82rem;color:var(--text-secondary);"></div>
-                        <button class="btn btn-danger btn-sm" onclick="clearAllData()" style="width:100%;margin-top:10px;">
-                            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>Clear All Data
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
 
 </div>
